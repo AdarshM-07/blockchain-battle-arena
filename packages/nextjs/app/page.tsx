@@ -17,6 +17,7 @@ const Home: NextPage = () => {
   const { targetNetwork } = useTargetNetwork();
   const [playerName, setPlayerName] = useState("");
   const { writeContractAsync: writeFindMatch } = useScaffoldWriteContract("GameConsole");
+  const { writeContractAsync: writeCancelMatch } = useScaffoldWriteContract("GameConsole");
   const router = useRouter();
 
   const { data: PlayGroundAddress } = useScaffoldReadContract({
@@ -24,6 +25,13 @@ const Home: NextPage = () => {
     functionName: "getMatchAddress",
     args: [connectedAddress],
   });
+
+  const { data: waitingPlayer, isLoading: isLoadingWaitingPlayer } = useScaffoldReadContract({
+    contractName: "GameConsole",
+    functionName: "waitingPlayer",
+  });
+
+  const isWaiting = waitingPlayer && waitingPlayer !== "0x0000000000000000000000000000000000000000" && waitingPlayer === connectedAddress;
 
   useEffect(() => {
     if (PlayGroundAddress && PlayGroundAddress !== "0x0000000000000000000000000000000000000000") {
@@ -41,10 +49,20 @@ const Home: NextPage = () => {
       await writeFindMatch({
         functionName: "findMatch",
         args: [playerName],
-        value: parseEther("0.1"),
+        value: parseEther("0.001"),
       });
     } catch (error) {
       console.error("Error finding match:", error);
+    }
+  };
+
+  const handleCancelMatch = async () => {
+    try {
+      await writeCancelMatch({
+        functionName: "cancelMatch",
+      });
+    } catch (error) {
+      console.error("Error canceling match:", error);
     }
   };
   return (
@@ -75,13 +93,27 @@ const Home: NextPage = () => {
                 className="input input-bordered w-full"
               />
             </div>
-            <button
-              onClick={handleFindMatch}
-              className="btn btn-primary flex items-center space-x-2"
-            >
-              <MagnifyingGlassIcon className="h-5 w-5" />
-              <span>Find Match (0.1 ETH)</span>
-            </button>
+            {!isWaiting ? (
+              <button
+                onClick={handleFindMatch}
+                className="btn btn-primary flex items-center space-x-2"
+              >
+                <MagnifyingGlassIcon className="h-5 w-5" />
+                <span>Find Match (0.001 ETH)</span>
+              </button>
+            ) : (
+              <div className="flex flex-col space-y-2 items-center">
+                <div className="text-lg font-semibold text-warning">
+                  ⏳ Waiting for opponent...
+                </div>
+                <button
+                  onClick={handleCancelMatch}
+                  className="btn btn-error btn-sm"
+                >
+                  Cancel Match
+                </button>
+              </div>
+            )}
           </div>
 
 

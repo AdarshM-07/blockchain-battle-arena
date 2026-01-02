@@ -5,10 +5,10 @@ A decentralized turn-based combat game built on Ethereum where two players battl
 ## 🎮 Overview
 
 This is a fully on-chain fighting game where players:
-- Deposit 0.1 ETH to enter matchmaking
+- Deposit 0.001 ETH to enter matchmaking
 - Battle for 5 rounds with 30-second move selection per round
 - Use strategic positioning (up/down) and attacks (basic/medium/special)
-- Winner takes 0.15 ETH, owner receives 0.05 ETH platform fee
+- Winner takes 0.0015 ETH, owner receives 0.0005 ETH platform fee
 
 ⚙️ Built using NextJS, Foundry, Wagmi, Viem, and Typescript (Scaffold-ETH 2).
 
@@ -21,7 +21,7 @@ This is a fully on-chain fighting game where players:
 - ⏱️ **Real-time Updates**: Game state refreshes every 3 seconds
 - 🎨 **Side-by-side UI**: Clean interface showing both players' stats
 - 🛡️ **Attack Exhaustion**: Automatic conversion to "stay" when attacks depleted
-- 💰 **Prize Pool**: 0.15 ETH to winner, 0.05 ETH platform fee
+- 💰 **Prize Pool**: 0.0015 ETH to winner, 0.0005 ETH platform fee
 
 ## 🏗️ Architecture
 
@@ -109,7 +109,7 @@ Visit your app on: `http://localhost:3000`
 
 ### Step 1: Find a Match
 1. Connect your wallet (use Anvil test accounts)
-2. Click "Find Match" and deposit 0.1 ETH
+2. Click "Find Match" and deposit 0.001 ETH
 3. Wait for another player to join
 
 ### Step 2: Battle
@@ -129,8 +129,8 @@ Visit your app on: `http://localhost:3000`
 
 ### Step 4: Victory
 - Game ends after 5 rounds or when a player reaches 0 health
-- Winner receives 0.15 ETH
-- Owner receives 0.05 ETH platform fee
+- Winner receives 0.0015 ETH
+- Owner receives 0.0005 ETH platform fee
 
 ## 📁 Project Structure
 
@@ -206,7 +206,7 @@ rm -rf packages/nextjs/.next
 ## 📝 Smart Contract Details
 
 ### GameConsole
-- `findMatch()`: Enter matchmaking with 0.1 ETH
+- `findMatch()`: Enter matchmaking with 0.001 ETH
 - `cancelMatch()`: Get refund if no opponent found
 - `clearMatchAddress()`: Remove game mapping after completion
 

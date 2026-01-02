@@ -252,21 +252,21 @@ contract PlayGround {
 
     function gameOver() internal {
         if (player1.health == player2.health) {
-            (bool success, ) = payable(owner).call{value: 0.2 ether}("");
+            (bool success, ) = payable(owner).call{value: address(this).balance}("");
             require(success, "Transfer failed");
         } else if (player1.health < player2.health) {
             (bool success, ) = payable(player2.playerAddress).call{
-                value: 0.15 ether
+                value: 0.0015 ether
             }("");
             require(success, "Transfer failed");
-            (bool success2, ) = payable(owner).call{value: 0.05 ether}("");
+            (bool success2, ) = payable(owner).call{value: 0.0005 ether}("");
             require(success2, "Transfer failed");
         } else if (player2.health < player1.health) {
             (bool success, ) = payable(player1.playerAddress).call{
-                value: 0.15 ether
+                value: 0.0015 ether
             }("");
             require(success, "Transfer failed");
-            (bool success2, ) = payable(owner).call{value: 0.05 ether}("");
+            (bool success2, ) = payable(owner).call{value: 0.0005 ether}("");
             require(success2, "Transfer failed");
         }
     }

@@ -14,7 +14,7 @@ const PlayGroundABI = JSON.parse(
 // Configuration
 const RPC_URL = 'http://127.0.0.1:8545'; // Anvil local node
 const OWNER_PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // First Anvil account
-const GAME_CONSOLE_ADDRESS = '0xeD1DB453C3156Ff3155a97AD217b3087D5Dc5f6E'; // Update after deployment
+const GAME_CONSOLE_ADDRESS = '0x700b6A60ce7EaaEA56F065753d8dcB9653dbAD35'; // Update after deployment
 
 // Setup provider and wallet
 const provider = new ethers.JsonRpcProvider(RPC_URL);

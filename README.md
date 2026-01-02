@@ -1,23 +1,52 @@
-# 🏗 Scaffold-ETH 2
+# ⚔️ Action Game - Blockchain Battle Arena
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+A decentralized turn-based combat game built on Ethereum where two players battle across 5 rounds using strategic moves and attacks.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+## 🎮 Overview
 
-⚙️ Built using NextJS, RainbowKit, Foundry, Wagmi, Viem, and Typescript.
+This is a fully on-chain fighting game where players:
+- Deposit 0.1 ETH to enter matchmaking
+- Battle for 5 rounds with 30-second move selection per round
+- Use strategic positioning (up/down) and attacks (basic/medium/special)
+- Winner takes 0.15 ETH, owner receives 0.05 ETH platform fee
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+⚙️ Built using NextJS, Foundry, Wagmi, Viem, and Typescript (Scaffold-ETH 2).
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+## ✨ Features
 
-## Requirements
+- ✅ **Decentralized Matchmaking**: Players find opponents via smart contract
+- ⚔️ **5-Round Combat**: Strategic battles with health management (starts at 10)
+- 🎯 **Attack Varieties**: Basic (1💥), Medium (2💥), Special (3💥) with limited uses
+- 🔄 **Auto Round Calculation**: Backend service triggers results from owner's account
+- ⏱️ **Real-time Updates**: Game state refreshes every 3 seconds
+- 🎨 **Side-by-side UI**: Clean interface showing both players' stats
+- 🛡️ **Attack Exhaustion**: Automatic conversion to "stay" when attacks depleted
+- 💰 **Prize Pool**: 0.15 ETH to winner, 0.05 ETH platform fee
+
+## 🏗️ Architecture
+
+### Smart Contracts (Solidity)
+- **GameConsole.sol**: Matchmaking system, emits `MatchFound` events
+- **PlayGround.sol**: Individual game logic with 5 rounds, damage calculation, prize distribution
+
+### Frontend (Next.js + TypeScript)
+- Real-time battle interface with timer (10s waiting + 30s move selection)
+- Move selection UI with 6 options
+- Auto-refresh player stats and game state
+
+### Backend Service (Node.js)
+- Monitors active games via events
+- Calls `calculateResult()` when time expires from owner's account
+
+## 🛠️ Tech Stack
+
+- **Blockchain**: Ethereum (Anvil local testnet)
+- **Contracts**: Solidity ^0.8.0, Foundry
+- **Frontend**: Next.js 15, React, TypeScript, TailwindCSS, DaisyUI
+- **Web3**: wagmi v2, viem
+- **Backend**: Node.js, ethers.js v6
+
+## 📦 Requirements & Installation
 
 Before you begin, you need to install the following tools:
 
@@ -25,47 +54,183 @@ Before you begin, you need to install the following tools:
 - Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
 - [Git](https://git-scm.com/downloads)
 
-## Quickstart
+## 🚀 Quickstart
 
-To get started with Scaffold-ETH 2, follow the steps below:
+### 1. Clone and install
 
-1. Install dependencies if it was skipped in CLI:
-
-```
-cd my-dapp-example
+```bash
+git clone https://github.com/AdarshM-07/blockchain-battle-arena
+cd blockchain-battle-arena
 yarn install
 ```
 
-2. Run a local network in the first terminal:
+### 2. Run a local blockchain
 
-```
+```bash
 yarn chain
 ```
 
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/foundry/foundry.toml`.
+This starts an Anvil local Ethereum network on `http://127.0.0.1:8545`.
 
-3. On a second terminal, deploy the test contract:
+### 3. Deploy contracts (in a new terminal)
 
-```
+```bash
 yarn deploy
 ```
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/foundry/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/foundry/script` to deploy the contract to the network. You can also customize the deploy script.
+This deploys GameConsole and PlayGround contracts. Note the GameConsole address from the output.
 
-4. On a third terminal, start your NextJS app:
+### 4. Setup and start backend service (in a new terminal)
 
+```bash
+cd backend-service
+npm install
 ```
+
+Edit `backend-service/index.js` and update:
+- `GAME_CONSOLE_ADDRESS`: Use the address from step 3
+- `OWNER_PRIVATE_KEY`: Default is first Anvil account (already set)
+
+```bash
+npm start
+```
+
+### 5. Start the frontend (in a new terminal)
+
+```bash
 yarn start
+# or
+npm start
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+Visit your app on: `http://localhost:3000`
 
-Run smart contract test with `yarn foundry:test`
+## 🎯 How to Play
 
-- Edit your smart contracts in `packages/foundry/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/foundry/script`
+### Step 1: Find a Match
+1. Connect your wallet (use Anvil test accounts)
+2. Click "Find Match" and deposit 0.1 ETH
+3. Wait for another player to join
 
+### Step 2: Battle
+- **Waiting Phase** (10s): Prepare your strategy
+- **Move Selection** (30s): Choose 5 moves:
+  - **No Move**: Stay in position
+  - **Move Up/Down**: Change lanes
+  - **Basic Attack**: 1 damage (3 available)
+  - **Medium Attack**: 2 damage (2 available)
+  - **Special Attack**: 3 damage (1 available)
+- Submit your moves before time runs out
+
+### Step 3: Round Results
+- Backend automatically calculates when time expires
+- Damage is dealt based on positioning and timing
+- Game refreshes with updated health and attack counts
+
+### Step 4: Victory
+- Game ends after 5 rounds or when a player reaches 0 health
+- Winner receives 0.15 ETH
+- Owner receives 0.05 ETH platform fee
+
+## 📁 Project Structure
+
+```
+blockchain-battle-arena/
+├── packages/
+│   ├── foundry/              # Smart contracts
+│   │   ├── contracts/
+│   │   │   ├── GameConsole.sol
+│   │   │   └── PlayGround.sol
+│   │   └── script/
+│   │       └── Deploy.s.sol
+│   └── nextjs/               # Frontend
+│       ├── app/
+│       │   ├── page.tsx      # Home page (matchmaking)
+│       │   └── game/[address]/page.tsx  # Game page
+│       └── contracts/        # Contract ABIs
+└── backend-service/          # Automated calculation
+    ├── index.js
+    └── package.json
+```
+
+## 🎮 Game Mechanics
+
+### Attack System
+- **Basic Attack (3)**: 1 damage
+- **Medium Attack (2)**: 2 damage
+- **Special Attack (1)**: 3 damage
+- Attacks auto-convert to "stay" when exhausted
+
+### Damage Calculation
+- Attacks hit if in same lane as opponent's next position
+- Simultaneous attacks reduce each other's damage
+- Defensive positioning can block incoming damage
+
+### Timer System
+- **10 seconds**: Waiting phase (new round prep)
+- **30 seconds**: Move selection phase
+- **Auto-calculation**: Backend triggers at time expiry
+
+## 🐛 Troubleshooting
+
+**Backend not working**
+- Check `GAME_CONSOLE_ADDRESS` matches deployed address
+- Verify blockchain is running: `yarn chain`
+
+**Timer shows "Time's Up" during waiting**
+- Refresh the page
+- Check console for errors
+
+**Can't submit moves**
+- Ensure timer shows positive seconds (not waiting phase)
+- Verify you're connected as a player
+
+## 🔧 Development
+
+**Run contract tests:**
+```bash
+cd packages/foundry
+forge test
+```
+
+**Redeploy contracts:**
+```bash
+yarn deploy
+```
+
+**Clean build cache:**
+```bash
+rm -rf packages/nextjs/.next
+```
+
+## 📝 Smart Contract Details
+
+### GameConsole
+- `findMatch()`: Enter matchmaking with 0.1 ETH
+- `cancelMatch()`: Get refund if no opponent found
+- `clearMatchAddress()`: Remove game mapping after completion
+
+### PlayGround
+- `PerformMoves()`: Submit 5 moves for current round
+- `calculateResult()`: Process round (called by owner/backend)
+- Emits `RoundCalculated` event on completion
+
+## 🚀 Future Enhancements
+
+- [ ] Multiple concurrent games
+- [ ] Leaderboard system
+- [ ] Ranked matchmaking
+- [ ] NFT rewards
+- [ ] Replay system
+- [ ] Mobile optimization
+
+## 📞 Support
+
+For issues or questions, please open an issue on GitHub.
+
+---
+
+**Built with ❤️ using Scaffold-ETH 2**
 
 ## Documentation
 

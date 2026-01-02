@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  // Disable analytics/telemetry in development
+  experimental: {
+    webVitalsAttribution: [],
+  },
 };
 
 const isIpfs = process.env.NEXT_PUBLIC_IPFS_BUILD === "true";

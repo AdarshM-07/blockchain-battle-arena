@@ -1,0 +1,12 @@
+{
+    "name": "backend-service",
+    "version": "1.0.0",
+    "description": "Backend service to automatically call calculateResult from owner's account",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "ethers": "^6.9.0"
+    }
+}

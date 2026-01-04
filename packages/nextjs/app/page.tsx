@@ -1,16 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Address } from "@scaffold-ui/components";
 import type { NextPage } from "next";
+import { parseEther } from "viem";
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
-import { parseEther } from "viem";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useTargetNetwork, useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-
-
+import { useScaffoldReadContract, useScaffoldWriteContract, useTargetNetwork } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
@@ -26,12 +24,15 @@ const Home: NextPage = () => {
     args: [connectedAddress],
   });
 
-  const { data: waitingPlayer, isLoading: isLoadingWaitingPlayer } = useScaffoldReadContract({
+  const { data: waitingPlayer } = useScaffoldReadContract({
     contractName: "GameConsole",
     functionName: "waitingPlayer",
   });
 
-  const isWaiting = waitingPlayer && waitingPlayer !== "0x0000000000000000000000000000000000000000" && waitingPlayer === connectedAddress;
+  const isWaiting =
+    waitingPlayer &&
+    waitingPlayer !== "0x0000000000000000000000000000000000000000" &&
+    waitingPlayer === connectedAddress;
 
   useEffect(() => {
     if (PlayGroundAddress && PlayGroundAddress !== "0x0000000000000000000000000000000000000000") {
@@ -89,37 +90,25 @@ const Home: NextPage = () => {
                 type="text"
                 placeholder="Enter your player name"
                 value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
+                onChange={e => setPlayerName(e.target.value)}
                 className="input input-bordered w-full"
               />
             </div>
             {!isWaiting ? (
-              <button
-                onClick={handleFindMatch}
-                className="btn btn-primary flex items-center space-x-2"
-              >
+              <button onClick={handleFindMatch} className="btn btn-primary flex items-center space-x-2">
                 <MagnifyingGlassIcon className="h-5 w-5" />
                 <span>Find Match (0.001 ETH)</span>
               </button>
             ) : (
               <div className="flex flex-col space-y-2 items-center">
-                <div className="text-lg font-semibold text-warning">
-                  ⏳ Waiting for opponent...
-                </div>
-                <button
-                  onClick={handleCancelMatch}
-                  className="btn btn-error btn-sm"
-                >
+                <div className="text-lg font-semibold text-warning">⏳ Waiting for opponent...</div>
+                <button onClick={handleCancelMatch} className="btn btn-error btn-sm">
                   Cancel Match
                 </button>
               </div>
             )}
           </div>
-
-
         </div>
-
-
       </div>
     </>
   );

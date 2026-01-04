@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Address } from "@scaffold-ui/components";
-import { parseEther } from "viem";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import PlayGroundABI from "~~/contracts/PlayGround.json";
 import { useScaffoldWriteContract, useTargetNetwork } from "~~/hooks/scaffold-eth";
@@ -26,14 +25,6 @@ type PlayerData = {
   basicAttackCount: bigint;
   mediumAttackCount: bigint;
   specialAttackCount: bigint;
-};
-
-type MovesData = {
-  move1: MoveType;
-  move2: MoveType;
-  move3: MoveType;
-  move4: MoveType;
-  move5: MoveType;
 };
 
 export default function GamePage() {
@@ -63,16 +54,20 @@ export default function GamePage() {
     chainId: targetNetwork.id,
   });
 
-  const player1Data: PlayerData | undefined = player1Raw
-    ? {
-        playerAddress: (player1Raw as any)[0],
-        name: (player1Raw as any)[1],
-        health: (player1Raw as any)[2],
-        basicAttackCount: (player1Raw as any)[3],
-        mediumAttackCount: (player1Raw as any)[4],
-        specialAttackCount: (player1Raw as any)[5],
-      }
-    : undefined;
+  const player1Data: PlayerData | undefined = useMemo(
+    () =>
+      player1Raw
+        ? {
+            playerAddress: (player1Raw as any)[0],
+            name: (player1Raw as any)[1],
+            health: (player1Raw as any)[2],
+            basicAttackCount: (player1Raw as any)[3],
+            mediumAttackCount: (player1Raw as any)[4],
+            specialAttackCount: (player1Raw as any)[5],
+          }
+        : undefined,
+    [player1Raw],
+  );
 
   const {
     data: player2Raw,
@@ -86,16 +81,20 @@ export default function GamePage() {
     chainId: targetNetwork.id,
   });
 
-  const player2Data: PlayerData | undefined = player2Raw
-    ? {
-        playerAddress: (player2Raw as any)[0],
-        name: (player2Raw as any)[1],
-        health: (player2Raw as any)[2],
-        basicAttackCount: (player2Raw as any)[3],
-        mediumAttackCount: (player2Raw as any)[4],
-        specialAttackCount: (player2Raw as any)[5],
-      }
-    : undefined;
+  const player2Data: PlayerData | undefined = useMemo(
+    () =>
+      player2Raw
+        ? {
+            playerAddress: (player2Raw as any)[0],
+            name: (player2Raw as any)[1],
+            health: (player2Raw as any)[2],
+            basicAttackCount: (player2Raw as any)[3],
+            mediumAttackCount: (player2Raw as any)[4],
+            specialAttackCount: (player2Raw as any)[5],
+          }
+        : undefined,
+    [player2Raw],
+  );
 
   const { data: moveSelectionStartTime, refetch: refetchMoveSelectionStartTime } = useReadContract({
     address: gameAddress as `0x${string}`,
@@ -108,20 +107,6 @@ export default function GamePage() {
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "moveSelectionDuration",
-    chainId: targetNetwork.id,
-  });
-
-  const { data: waitDuration } = useReadContract({
-    address: gameAddress as `0x${string}`,
-    abi: PlayGroundABI.abi,
-    functionName: "waitDuration",
-    chainId: targetNetwork.id,
-  });
-
-  const { data: owner } = useReadContract({
-    address: gameAddress as `0x${string}`,
-    abi: PlayGroundABI.abi,
-    functionName: "owner",
     chainId: targetNetwork.id,
   });
 
@@ -139,36 +124,36 @@ export default function GamePage() {
     chainId: targetNetwork.id,
   }) as { data: number | undefined; refetch: () => void };
 
-  const { data: p1Moves, refetch: refetchP1Moves } = useReadContract({
+  const { refetch: refetchP1Moves } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "P1moves",
     chainId: targetNetwork.id,
-  }) as { data: MovesData | undefined; refetch: () => void };
+  }) as { refetch: () => void };
 
-  const { data: p2Moves, refetch: refetchP2Moves } = useReadContract({
+  const { refetch: refetchP2Moves } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "P2moves",
     chainId: targetNetwork.id,
-  }) as { data: MovesData | undefined; refetch: () => void };
+  }) as { refetch: () => void };
 
-  const { data: player1Moved, refetch: refetchPlayer1Moved } = useReadContract({
+  const { refetch: refetchPlayer1Moved } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "player1Moved",
     chainId: targetNetwork.id,
-  }) as { data: boolean | undefined; refetch: () => void };
+  }) as { refetch: () => void };
 
-  const { data: player2Moved, refetch: refetchPlayer2Moved } = useReadContract({
+  const { refetch: refetchPlayer2Moved } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "player2Moved",
     chainId: targetNetwork.id,
-  }) as { data: boolean | undefined; refetch: () => void };
+  }) as { refetch: () => void };
 
   // Refetch all game data
-  const refetchAllData = async () => {
+  const refetchAllData = useCallback(async () => {
     await Promise.all([
       refetchPlayer1(),
       refetchPlayer2(),
@@ -180,7 +165,17 @@ export default function GamePage() {
       refetchPlayer2Moved(),
       refetchMoveSelectionStartTime(),
     ]);
-  };
+  }, [
+    refetchPlayer1,
+    refetchPlayer2,
+    refetchGameCount,
+    refetchGameState,
+    refetchP1Moves,
+    refetchP2Moves,
+    refetchPlayer1Moved,
+    refetchPlayer2Moved,
+    refetchMoveSelectionStartTime,
+  ]);
 
   // Mount effect to avoid hydration errors
   useEffect(() => {
@@ -218,7 +213,7 @@ export default function GamePage() {
     }, 3000); // Refresh every 3 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [refetchAllData]);
 
   // Timer countdown - reset when moveSelectionStartTime changes (new round starts)
   useEffect(() => {
@@ -293,8 +288,6 @@ export default function GamePage() {
   const canSubmitMoves =
     isPlayer && (gameState === 0 || gameState === undefined) && hasGameStarted && timeRemaining > 0;
   const isTimeUp = isMounted && timeRemaining <= 0 && hasGameStarted && !isWaitingPhase;
-  const bothPlayersMoved = player1Moved && player2Moved;
-  const canCalculate = gameState === 0 && (isTimeUp || bothPlayersMoved);
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -485,7 +478,7 @@ export default function GamePage() {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <span>You are not a player in this game. Connect with a player's wallet to participate.</span>
+              <span>You are not a player in this game. Connect with a player&apos;s wallet to participate.</span>
             </div>
             <div className="text-xs mt-2 opacity-70">
               <p>Connected: {connectedAddress || "No wallet connected"}</p>
@@ -562,7 +555,7 @@ export default function GamePage() {
               </button>
             </div>
             {!canSubmitMoves && hasGameStarted && timeRemaining === 0 && (
-              <p className="text-error text-sm mt-2">Time's up! Waiting for round calculation...</p>
+              <p className="text-error text-sm mt-2">Time&apos;s up! Waiting for round calculation...</p>
             )}
           </div>
         </div>

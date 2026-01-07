@@ -1,6 +1,6 @@
 # ⚔️ Action Game - Blockchain Battle Arena
 
-A decentralized turn-based combat game built on Ethereum where two players battle across 5 rounds using strategic moves and attacks.
+**A fully on-chain PvP fighting game built on Ethereum with real-time blockchain interaction, smart contract-based matchmaking, and automated round calculation using event-driven architecture.**
 
 ## 🎮 Overview
 

@@ -67,27 +67,23 @@ async function monitorGames() {
 
             // Check if time has expired
             if (now >= endTime) {
-                // Check if both players have moved
+                // Check if players have moved
                 const player1Moved = await playGround.player1Moved();
                 const player2Moved = await playGround.player2Moved();
 
-                if (player1Moved && player2Moved) {
-                    console.log(`Time expired for game ${gameAddress}`);
-                    console.log(`Calling calculateResult from owner account...`);
+                console.log(`Time expired for game ${gameAddress}`);
+                console.log(`Player1 moved: ${player1Moved}, Player2 moved: ${player2Moved}`);
+                console.log(`Calling calculateResult from owner account...`);
 
-                    try {
-                        const tx = await playGround.calculateResult();
-                        console.log(`Transaction sent: ${tx.hash}`);
+                try {
+                    const tx = await playGround.calculateResult();
+                    console.log(`Transaction sent: ${tx.hash}`);
 
-                        const receipt = await tx.wait();
-                        console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
-                        console.log(`Gas used: ${receipt.gasUsed.toString()}\n`);
-                    } catch (error) {
-                        console.error(`Error calling calculateResult:`, error.message, '\n');
-                    }
-                } else {
-                    console.log(`Game ${gameAddress} time expired but players haven't moved yet`);
-                    console.log(`Player1 moved: ${player1Moved}, Player2 moved: ${player2Moved}\n`);
+                    const receipt = await tx.wait();
+                    console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+                    console.log(`Gas used: ${receipt.gasUsed.toString()}\n`);
+                } catch (error) {
+                    console.error(`Error calling calculateResult:`, error.message, '\n');
                 }
             }
         } catch (error) {

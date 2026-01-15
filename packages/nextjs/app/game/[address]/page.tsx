@@ -122,35 +122,35 @@ export default function GamePage() {
     abi: PlayGroundABI.abi,
     functionName: "gameState",
     chainId: targetNetwork.id,
-  }) as { data: number | undefined; refetch: () => void };
+  });
 
   const { refetch: refetchP1Moves } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "P1moves",
     chainId: targetNetwork.id,
-  }) as { refetch: () => void };
+  });
 
   const { refetch: refetchP2Moves } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "P2moves",
     chainId: targetNetwork.id,
-  }) as { refetch: () => void };
+  });
 
   const { refetch: refetchPlayer1Moved } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "player1Moved",
     chainId: targetNetwork.id,
-  }) as { refetch: () => void };
+  });
 
   const { refetch: refetchPlayer2Moved } = useReadContract({
     address: gameAddress as `0x${string}`,
     abi: PlayGroundABI.abi,
     functionName: "player2Moved",
     chainId: targetNetwork.id,
-  }) as { refetch: () => void };
+  });
 
   // Refetch all game data
   const refetchAllData = useCallback(async () => {
@@ -339,6 +339,89 @@ export default function GamePage() {
         </div>
       </div>
 
+      {/* Health Bars and Round Counter */}
+      <div className="card shadow-2xl mb-6">
+        <div className="card-body">
+          <div className="relative flex items-center justify-between mb-6">
+            {/* Left Health Bar (User) */}
+            <div style={{ width: "250px" }}>
+              <div className="bg-black/90 p-4 rounded-lg border-2 border-yellow-500/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-3xl">🧙</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-yellow-400 uppercase tracking-wider">
+                      {connectedAddress === player1Data?.playerAddress ? player1Data?.name : player2Data?.name || "You"}
+                    </p>
+                    <p className="text-xs text-gray-400">(You)</p>
+                  </div>
+                </div>
+                <div className="relative h-8 bg-gray-900 rounded border-2 border-gray-700 overflow-hidden">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-600 via-red-500 to-yellow-500 transition-all duration-500"
+                    style={{
+                      width: `${(Number(connectedAddress === player1Data?.playerAddress ? player1Data?.health : player2Data?.health || 0) / 10) * 100}%`,
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    style={{ textShadow: "2px 2px 4px black" }}
+                  >
+                    {Number(
+                      connectedAddress === player1Data?.playerAddress ? player1Data?.health : player2Data?.health || 0,
+                    )}{" "}
+                    / 10
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Round Counter */}
+            <div>
+              <div
+                className="bg-gradient-to-b from-yellow-400 to-orange-500 text-black px-8 py-3 rounded font-black text-2xl shadow-2xl border-4 border-yellow-600"
+                style={{ textShadow: "1px 1px 0px white" }}
+              >
+                ROUND {6 - (gameCount ? Number(gameCount) : 0)}
+              </div>
+            </div>
+
+            {/* Right Health Bar (Opponent) */}
+            <div style={{ width: "250px" }}>
+              <div className="bg-black/90 p-4 rounded-lg border-2 border-yellow-500/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-bold text-yellow-400 uppercase tracking-wider">
+                      {connectedAddress === player1Data?.playerAddress
+                        ? player2Data?.name
+                        : player1Data?.name || "Opponent"}
+                    </p>
+                    <p className="text-xs text-gray-400">Opponent</p>
+                  </div>
+                  <div className="text-3xl">🧙</div>
+                </div>
+                <div className="relative h-8 bg-gray-900 rounded border-2 border-gray-700 overflow-hidden">
+                  <div
+                    className="absolute top-0 right-0 h-full bg-gradient-to-l from-red-600 via-red-500 to-yellow-500 transition-all duration-500"
+                    style={{
+                      width: `${(Number(connectedAddress === player1Data?.playerAddress ? player2Data?.health : player1Data?.health || 0) / 10) * 100}%`,
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    style={{ textShadow: "2px 2px 4px black" }}
+                  >
+                    {Number(
+                      connectedAddress === player1Data?.playerAddress ? player2Data?.health : player1Data?.health || 0,
+                    )}{" "}
+                    / 10
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Players Info - Side by Side */}
       <div className="card bg-base-200 shadow-xl mb-6">
         <div className="card-body">
@@ -354,16 +437,6 @@ export default function GamePage() {
               </div>
 
               <div className="space-y-3">
-                <div className="bg-primary-focus rounded-lg p-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Health</span>
-                    <span className="text-2xl font-bold">
-                      {connectedAddress === player1Data?.playerAddress
-                        ? player1Data?.health?.toString() || "0"
-                        : player2Data?.health?.toString() || "0"}
-                    </span>
-                  </div>
-                </div>
                 <div className="bg-primary-focus rounded-lg p-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Basic Attacks</span>
@@ -414,16 +487,6 @@ export default function GamePage() {
               </div>
 
               <div className="space-y-3">
-                <div className="bg-base-100 rounded-lg p-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Health</span>
-                    <span className="text-2xl font-bold">
-                      {connectedAddress === player1Data?.playerAddress
-                        ? player2Data?.health?.toString() || "0"
-                        : player1Data?.health?.toString() || "0"}
-                    </span>
-                  </div>
-                </div>
                 <div className="bg-base-100 rounded-lg p-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Basic Attacks</span>
@@ -562,7 +625,7 @@ export default function GamePage() {
       )}
 
       {/* Game Over */}
-      {gameState === 1 && (
+      {typeof gameState === "number" && Number(gameState) === 1 && (
         <div className="alert alert-info shadow-lg">
           <div>
             <svg
